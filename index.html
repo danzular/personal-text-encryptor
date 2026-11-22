@@ -1,0 +1,1629 @@
+﻿<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline'; style-src 'unsafe-inline'; connect-src https://www.cloudflare.com https://1.1.1.1 https://timeapi.io https://api.github.com;" />
+  <title>PERSONAL TEXT ENCRYPTOR V1.2</title>
+  <style>
+    :root {
+      --bg-base: #0b0f17;
+      --bg-panel: #131924;
+      --bg-panel-alt: #18202e;
+      --bg-input: #1d2636;
+      --bg-input-focus: #222d40;
+      --border-subtle: #283347;
+      --border-strong: #384763;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-hover: #0ea5e9;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --accent-border: rgba(56, 189, 248, 0.45);
+      --success: #34d399;
+      --success-soft: rgba(52, 211, 153, 0.12);
+      --warning: #fbbf24;
+      --warning-soft: rgba(251, 191, 36, 0.1);
+      --warning-border: rgba(251, 191, 36, 0.35);
+      --danger: #f87171;
+      --danger-soft: rgba(248, 113, 113, 0.12);
+      --danger-border: rgba(248, 113, 113, 0.35);
+      --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100%;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      font-size: 15px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    /* Gate Screen */
+    .gate-wrapper {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .gate-card {
+      width: 100%;
+      max-width: 420px;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+    }
+
+    .gate-brand {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+
+    .gate-title-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .gate-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      color: var(--text-primary);
+    }
+
+    .version-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      padding: 2px 7px;
+      border-radius: 5px;
+    }
+
+    .gate-subtitle {
+      margin-top: 6px;
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+    }
+
+    .gate-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--bg-panel-alt);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 9px 12px;
+      margin-bottom: 18px;
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+    }
+
+    .status-dot-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--text-muted);
+      flex-shrink: 0;
+    }
+
+    .status-dot.checking {
+      background: var(--warning);
+    }
+
+    .status-dot.ready {
+      background: var(--success);
+    }
+
+    .status-dot.error {
+      background: var(--danger);
+    }
+
+    .field-group {
+      margin-bottom: 16px;
+    }
+
+    .field-label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      margin-bottom: 6px;
+      letter-spacing: 0.02em;
+    }
+
+    .input-row {
+      display: flex;
+      align-items: stretch;
+      gap: 8px;
+    }
+
+    input[type="password"],
+    input[type="text"],
+    textarea {
+      width: 100%;
+      background: var(--bg-input);
+      color: var(--text-primary);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-family: var(--font-sans);
+      font-size: 0.94rem;
+      transition: border-color 0.15s ease, background-color 0.15s ease;
+    }
+
+    input[type="password"]:focus,
+    input[type="text"]:focus,
+    textarea:focus {
+      outline: none;
+      border-color: var(--accent);
+      background: var(--bg-input-focus);
+    }
+
+    textarea {
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      line-height: 1.55;
+      resize: vertical;
+      min-height: 120px;
+    }
+
+    textarea[readonly] {
+      background: var(--bg-panel-alt);
+      color: var(--text-primary);
+    }
+
+    button {
+      cursor: pointer;
+      font-family: var(--font-sans);
+      font-size: 0.85rem;
+      font-weight: 600;
+      border-radius: 8px;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-panel-alt);
+      color: var(--text-primary);
+      padding: 9px 14px;
+      transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+      white-space: nowrap;
+    }
+
+    button:hover:not(:disabled) {
+      border-color: var(--border-strong);
+      background: #212b3d;
+    }
+
+    button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: #06121e;
+      border-color: var(--accent);
+      font-weight: 700;
+    }
+
+    .btn-primary:hover:not(:disabled) {
+      background: var(--accent-hover);
+      border-color: var(--accent-hover);
+    }
+
+    .btn-secondary {
+      background: var(--bg-input);
+      border-color: var(--border-subtle);
+      color: var(--text-primary);
+    }
+
+    .btn-secondary:hover:not(:disabled) {
+      border-color: var(--accent-border);
+      background: #243044;
+    }
+
+    .btn-ghost {
+      background: transparent;
+      border-color: var(--border-subtle);
+      color: var(--text-secondary);
+      padding: 7px 11px;
+      font-size: 0.8rem;
+    }
+
+    .btn-ghost:hover:not(:disabled) {
+      color: var(--text-primary);
+      border-color: var(--border-strong);
+      background: var(--bg-panel-alt);
+    }
+
+    .btn-full {
+      width: 100%;
+      padding: 11px 16px;
+      font-size: 0.9rem;
+      letter-spacing: 0.04em;
+    }
+
+    .alert-box {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 8px;
+      font-size: 0.84rem;
+      border: 1px solid var(--border-subtle);
+      background: var(--bg-panel-alt);
+      color: var(--text-secondary);
+    }
+
+    .alert-box.error {
+      background: var(--danger-soft);
+      border-color: var(--danger-border);
+      color: var(--danger);
+    }
+
+    .alert-box.success {
+      background: var(--success-soft);
+      border-color: rgba(52, 211, 153, 0.35);
+      color: var(--success);
+    }
+
+    .alert-box.info {
+      background: var(--accent-soft);
+      border-color: var(--accent-border);
+      color: var(--accent);
+    }
+
+    /* Main App Layout */
+    .app-container {
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 20px 16px 40px;
+    }
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .app-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+    }
+
+    .local-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--success);
+      background: var(--success-soft);
+      border: 1px solid rgba(52, 211, 153, 0.35);
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+
+    .local-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--success);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Mode Selector: Always Left = PTE1, Right = PTE2 */
+    .mode-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .mode-tab {
+      text-align: left;
+      white-space: normal;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: 14px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .mode-tab:hover:not(:disabled) {
+      background: var(--bg-panel-alt);
+      border-color: var(--border-strong);
+    }
+
+    .mode-tab.active {
+      background: var(--bg-panel-alt);
+      border-color: var(--accent);
+      box-shadow: inset 0 0 0 1px var(--accent);
+    }
+
+    .mode-tab-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .mode-tab-title {
+      font-family: var(--font-mono);
+      font-size: 0.86rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .mode-tab.active .mode-tab-title {
+      color: var(--accent);
+    }
+
+    .mode-tab-desc {
+      font-size: 0.78rem;
+      font-weight: 400;
+      color: var(--text-secondary);
+      line-height: 1.4;
+    }
+
+    /* Workspace Panel */
+    .workspace-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .mode-banner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding-bottom: 14px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .active-mode-pill {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--accent);
+      background: var(--accent-soft);
+      border: 1px solid var(--accent-border);
+      padding: 3px 9px;
+      border-radius: 5px;
+    }
+
+    .algo-name {
+      font-family: var(--font-mono);
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    .deterministic-warning {
+      background: var(--warning-soft);
+      border: 1px solid var(--warning-border);
+      color: var(--warning);
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      line-height: 1.45;
+      margin-bottom: 16px;
+    }
+
+    .label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+
+    .label-hint {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+    }
+
+    .action-bar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin: 18px 0;
+    }
+
+    .action-bar .btn-primary,
+    .action-bar .btn-secondary {
+      min-width: 124px;
+      padding: 10px 18px;
+      letter-spacing: 0.03em;
+    }
+
+    .action-spacer {
+      flex: 1;
+    }
+
+    .payload-note {
+      margin-top: 14px;
+      padding: 9px 12px;
+      background: var(--bg-panel-alt);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--text-secondary);
+      line-height: 1.45;
+    }
+
+    /* About / Security Drawer */
+    .about-panel {
+      background: var(--bg-panel);
+      border: 1px solid var(--border-strong);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+
+    .about-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .about-title {
+      font-size: 0.96rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      color: var(--accent);
+    }
+
+    .about-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      font-size: 0.84rem;
+      color: var(--text-secondary);
+    }
+
+    .about-list li {
+      padding-left: 14px;
+      position: relative;
+    }
+
+    .about-list li::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+    }
+
+    .about-list strong {
+      color: var(--text-primary);
+    }
+
+    .mono-inline {
+      font-family: var(--font-mono);
+      font-size: 0.79rem;
+      color: var(--text-primary);
+      background: var(--bg-input);
+      padding: 1px 5px;
+      border-radius: 4px;
+      word-break: break-all;
+    }
+
+    @media (max-width: 600px) {
+      .mode-tab {
+        padding: 11px 10px;
+      }
+      .mode-tab-title {
+        font-size: 0.78rem;
+      }
+      .mode-tab-desc {
+        font-size: 0.73rem;
+      }
+      .workspace-panel {
+        padding: 15px;
+      }
+      .action-bar .btn-primary,
+      .action-bar .btn-secondary {
+        flex: 1;
+        min-width: 0;
+      }
+      .action-spacer {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- OPENING ACCESS GATE -->
+  <main id="gateView" class="gate-wrapper">
+    <section class="gate-card" aria-labelledby="gateTitle">
+      <div class="gate-brand">
+        <div class="gate-title-row">
+          <h1 id="gateTitle" class="gate-title">PERSONAL TEXT ENCRYPTOR</h1>
+          <span class="version-badge">V1.2</span>
+        </div>
+        <p class="gate-subtitle">Private Text Encryption Tool</p>
+      </div>
+
+      <div class="gate-status-bar" role="status" aria-live="polite">
+        <div class="status-dot-wrap">
+          <span id="serverDot" class="status-dot checking"></span>
+          <span id="serverStatusText">Verifying server time...</span>
+        </div>
+        <button type="button" id="retryTimeBtn" class="btn-ghost hidden">Retry</button>
+      </div>
+
+      <form id="gateForm" autocomplete="off" novalidate>
+        <div class="field-group">
+          <label for="passcodeInput" class="field-label">Passcode</label>
+          <div class="input-row">
+            <input
+              type="password"
+              id="passcodeInput"
+              name="access_token_field"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="off"
+              spellcheck="false"
+              required
+            />
+            <button type="button" id="togglePasscodeBtn" class="btn-secondary" aria-label="Toggle passcode visibility">Show</button>
+          </div>
+        </div>
+
+        <button type="submit" id="unlockBtn" class="btn-primary btn-full">UNLOCK</button>
+      </form>
+
+      <div id="gateAlert" class="alert-box error hidden" role="alert"></div>
+    </section>
+  </main>
+
+  <!-- MAIN WORKSPACE -->
+  <div id="appView" class="app-container hidden">
+    <header class="app-header">
+      <div class="header-left">
+        <span class="app-title">PERSONAL TEXT ENCRYPTOR</span>
+        <span class="version-badge">V1.2</span>
+        <span class="local-badge">LOCAL CRYPTO</span>
+      </div>
+      <div class="header-actions">
+        <button type="button" id="aboutToggleBtn" class="btn-ghost">ABOUT / SECURITY</button>
+        <button type="button" id="lockBtn" class="btn-ghost">LOCK</button>
+      </div>
+    </header>
+
+    <!-- ABOUT / SECURITY SECTION -->
+    <section id="aboutPanel" class="about-panel hidden" aria-labelledby="aboutHeading">
+      <div class="about-header">
+        <h2 id="aboutHeading" class="about-title">ABOUT / SECURITY — PERSONAL TEXT ENCRYPTOR V1.2</h2>
+        <button type="button" id="closeAboutBtn" class="btn-ghost">CLOSE</button>
+      </div>
+      <ul class="about-list">
+        <li><strong>Aplikasi:</strong> PERSONAL TEXT ENCRYPTOR V1.2 — seluruh operasi enkripsi dan dekripsi dijalankan secara lokal di browser tanpa mengirim teks atau passphrase ke server.</li>
+        <li><strong>PTE1 (Kiri):</strong> Menggunakan <span class="mono-inline">AES-256-GCM</span> dan <span class="mono-inline">PBKDF2-HMAC-SHA256</span> (600.000 iterasi, derived key 256-bit), salt acak 16 byte, nonce acak 12 byte, authentication tag 128-bit, serta AAD kosong.</li>
+        <li><strong>PTE2 (Kanan):</strong> Menggunakan <span class="mono-inline">AES-256-SIV</span> sesuai <span class="mono-inline">RFC 5297</span> dan <span class="mono-inline">PBKDF2-HMAC-SHA256</span> (600.000 iterasi, derived key 64 byte / 512-bit), tanpa nonce, AAD kosong, serta fixed salt UTF-8 <span class="mono-inline">PTE2-FIXED-SALT-AES256SIV-V1</span> (28 byte, hex <span class="mono-inline">505445322d46495845442d53414c542d4145533235365349562d5631</span>).</li>
+        <li><strong>Format Ciphertext:</strong> PTE1 dan PTE2 sama-sama menghasilkan teks Base64 standar mentah tanpa prefix atau wrapper. Pilih mode yang sesuai secara manual sebelum melakukan dekripsi.</li>
+        <li><strong>Sifat Deterministic PTE2:</strong> PTE2 menghasilkan ciphertext yang identik untuk plaintext dan passphrase yang sama, sehingga dapat mengungkap kesamaan isi catatan. PTE1 menggunakan salt dan nonce acak baru pada setiap enkripsi.</li>
+        <li><strong>Pembatas Akses Antarmuka:</strong> Passcode gate pada halaman pembuka hanya berfungsi sebagai pembatas akses antarmuka, bukan mekanisme autentikasi kuat maupun perlindungan kriptografi data.</li>
+        <li><strong>Manajemen Kunci &amp; Backup:</strong> Kehilangan master passphrase menyebabkan data terenkripsi tidak dapat dipulihkan. Simpan salinan cadangan ciphertext dan jangan pernah menyimpan master passphrase bersama ciphertext.</li>
+      </ul>
+    </section>
+
+    <!-- HORIZONTAL MODE SELECTOR: PTE1 LEFT, PTE2 RIGHT -->
+    <nav class="mode-grid" aria-label="Encryption Mode">
+      <button type="button" id="tabPte1" class="mode-tab active" aria-pressed="true">
+        <div class="mode-tab-header">
+          <span class="mode-tab-title">PTE1: AES-256-GCM</span>
+        </div>
+        <span class="mode-tab-desc">Randomized authenticated encryption.</span>
+      </button>
+
+      <button type="button" id="tabPte2" class="mode-tab" aria-pressed="false">
+        <div class="mode-tab-header">
+          <span class="mode-tab-title">PTE2: DETERMINISTIC AES-256-SIV</span>
+        </div>
+        <span class="mode-tab-desc">Input dan passphrase yang sama menghasilkan ciphertext yang sama.</span>
+      </button>
+    </nav>
+
+    <!-- ENCRYPT / DECRYPT WORKSPACE -->
+    <section class="workspace-panel">
+      <div class="mode-banner">
+        <span id="activeModeIndicator" class="active-mode-pill">MODE AKTIF: PTE1</span>
+        <span id="activeAlgoName" class="algo-name">AES-256-GCM (PBKDF2-HMAC-SHA256, 600.000 iterasi)</span>
+      </div>
+
+      <div id="pte2Warning" class="deterministic-warning hidden" role="note">
+        Deterministic encryption menghasilkan ciphertext yang sama untuk input dan passphrase yang sama. Hal ini dapat mengungkap bahwa dua catatan memiliki isi identik.
+      </div>
+
+      <div class="field-group">
+        <div class="label-row">
+          <label for="textInput" class="field-label">Input Teks / Ciphertext</label>
+          <span id="inputHint" class="label-hint">Masukkan teks untuk dienkripsi atau Base64 mentah untuk didekripsi</span>
+        </div>
+        <textarea
+          id="textInput"
+          rows="5"
+          spellcheck="false"
+          autocomplete="off"
+        ></textarea>
+      </div>
+
+      <div class="field-group">
+        <label for="passphraseInput" class="field-label">Master Passphrase</label>
+        <div class="input-row">
+          <input
+            type="password"
+            id="passphraseInput"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+          />
+          <button type="button" id="togglePassphraseBtn" class="btn-secondary">Tampilkan</button>
+        </div>
+      </div>
+
+      <div class="action-bar">
+        <button type="button" id="encryptBtn" class="btn-primary">ENCRYPT</button>
+        <button type="button" id="decryptBtn" class="btn-secondary">DECRYPT</button>
+        <span class="action-spacer"></span>
+        <button type="button" id="copyBtn" class="btn-secondary">COPY RESULT</button>
+        <button type="button" id="clearBtn" class="btn-ghost">CLEAR</button>
+      </div>
+
+      <div class="field-group" style="margin-bottom: 0;">
+        <div class="label-row">
+          <label for="resultOutput" class="field-label">Hasil</label>
+          <span class="label-hint">Base64 standar mentah tanpa prefix (Encrypt) / Teks UTF-8 (Decrypt)</span>
+        </div>
+        <textarea
+          id="resultOutput"
+          rows="5"
+          readonly
+          spellcheck="false"
+        ></textarea>
+      </div>
+
+      <div id="workspaceStatus" class="alert-box hidden" role="status" aria-live="polite"></div>
+
+      <div id="payloadFormatInfo" class="payload-note">
+        Format Payload PTE1: Base64( salt [16 byte] || nonce [12 byte] || ciphertext || authentication tag [16 byte] ) — AAD kosong, tanpa prefix.
+      </div>
+    </section>
+  </div>
+
+  <script>
+    (function () {
+      "use strict";
+
+      /* =====================================================================
+       * CRYPTOGRAPHIC CONSTANTS (MASTER SPECIFICATION V1.2)
+       * ===================================================================== */
+      const PBKDF2_ITERATIONS = 600000;
+      const PTE1_SALT_BYTES = 16;
+      const PTE1_NONCE_BYTES = 12;
+      const PTE1_TAG_BITS = 128;
+      const PTE1_MIN_PAYLOAD = 44; // 16 + 12 + 16
+
+      // PTE2 fixed salt: exact 28-byte UTF-8 string
+      // Hex: 505445322d46495845442d53414c542d4145533235365349562d5631
+      const PTE2_FIXED_SALT_STR = "PTE2-FIXED-SALT-AES256SIV-V1";
+      const PTE2_DK_BYTES = 64; // 512 bits -> K1 (32B) || K2 (32B)
+      const PTE2_MIN_PAYLOAD = 16; // 16-byte SIV
+
+      const textEncoder = new TextEncoder();
+      const textDecoderFatal = new TextDecoder("utf-8", { fatal: true });
+
+      /* =====================================================================
+       * DOM REFERENCES
+       * ===================================================================== */
+      const gateView = document.getElementById("gateView");
+      const appView = document.getElementById("appView");
+      const gateForm = document.getElementById("gateForm");
+      const passcodeInput = document.getElementById("passcodeInput");
+      const togglePasscodeBtn = document.getElementById("togglePasscodeBtn");
+      const unlockBtn = document.getElementById("unlockBtn");
+      const gateAlert = document.getElementById("gateAlert");
+      const serverDot = document.getElementById("serverDot");
+      const serverStatusText = document.getElementById("serverStatusText");
+      const retryTimeBtn = document.getElementById("retryTimeBtn");
+
+      const aboutToggleBtn = document.getElementById("aboutToggleBtn");
+      const aboutPanel = document.getElementById("aboutPanel");
+      const closeAboutBtn = document.getElementById("closeAboutBtn");
+      const lockBtn = document.getElementById("lockBtn");
+
+      const tabPte1 = document.getElementById("tabPte1");
+      const tabPte2 = document.getElementById("tabPte2");
+      const activeModeIndicator = document.getElementById("activeModeIndicator");
+      const activeAlgoName = document.getElementById("activeAlgoName");
+      const pte2Warning = document.getElementById("pte2Warning");
+      const payloadFormatInfo = document.getElementById("payloadFormatInfo");
+
+      const textInput = document.getElementById("textInput");
+      const passphraseInput = document.getElementById("passphraseInput");
+      const togglePassphraseBtn = document.getElementById("togglePassphraseBtn");
+      const encryptBtn = document.getElementById("encryptBtn");
+      const decryptBtn = document.getElementById("decryptBtn");
+      const copyBtn = document.getElementById("copyBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const resultOutput = document.getElementById("resultOutput");
+      const workspaceStatus = document.getElementById("workspaceStatus");
+
+      let activeMode = "PTE1";
+      let isBusy = false;
+
+      /* =====================================================================
+       * SERVER TIME ACCESS VALIDATION (HTTPS ONLY, NO DEVICE CLOCK FALLBACK)
+       * ===================================================================== */
+      async function fetchWithTimeout(url, options, timeoutMs) {
+        const controller = new AbortController();
+        const timer = setTimeout(function () {
+          controller.abort();
+        }, timeoutMs);
+        try {
+          const response = await fetch(url, Object.assign({}, options, {
+            signal: controller.signal,
+            cache: "no-store",
+            credentials: "omit",
+            referrerPolicy: "no-referrer"
+          }));
+          return response;
+        } finally {
+          clearTimeout(timer);
+        }
+      }
+
+      async function fetchServerUtcMillis() {
+        const sources = [
+          async function () {
+            const res = await fetchWithTimeout("https://www.cloudflare.com/cdn-cgi/trace", { method: "GET" }, 6000);
+            if (!res.ok) throw new Error("HTTP error");
+            const body = await res.text();
+            const match = body.match(/^ts=(\d+(?:\.\d+)?)$/m);
+            if (!match) throw new Error("Invalid response");
+            const sec = parseFloat(match[1]);
+            if (!Number.isFinite(sec) || sec < 1700000000) throw new Error("Invalid timestamp");
+            return Math.floor(sec * 1000);
+          },
+          async function () {
+            const res = await fetchWithTimeout("https://1.1.1.1/cdn-cgi/trace", { method: "GET" }, 6000);
+            if (!res.ok) throw new Error("HTTP error");
+            const body = await res.text();
+            const match = body.match(/^ts=(\d+(?:\.\d+)?)$/m);
+            if (!match) throw new Error("Invalid response");
+            const sec = parseFloat(match[1]);
+            if (!Number.isFinite(sec) || sec < 1700000000) throw new Error("Invalid timestamp");
+            return Math.floor(sec * 1000);
+          },
+          async function () {
+            const res = await fetchWithTimeout("https://timeapi.io/api/time/current/zone?timeZone=UTC", { method: "GET" }, 6500);
+            if (!res.ok) throw new Error("HTTP error");
+            const data = await res.json();
+            if (!data || typeof data.dateTime !== "string") throw new Error("Invalid response");
+            const parsed = Date.parse(data.dateTime.endsWith("Z") ? data.dateTime : data.dateTime + "Z");
+            if (!Number.isFinite(parsed) || parsed < 1700000000000) throw new Error("Invalid timestamp");
+            return parsed;
+          },
+          async function () {
+            const res = await fetchWithTimeout("https://api.github.com", { method: "HEAD" }, 6500);
+            const dateHeader = res.headers.get("Date");
+            if (!dateHeader) throw new Error("Missing Date header");
+            const parsed = Date.parse(dateHeader);
+            if (!Number.isFinite(parsed) || parsed < 1700000000000) throw new Error("Invalid timestamp");
+            return parsed;
+          }
+        ];
+
+        for (let i = 0; i < sources.length; i++) {
+          try {
+            const utcMs = await sources[i]();
+            if (typeof utcMs === "number" && Number.isFinite(utcMs)) {
+              return utcMs;
+            }
+          } catch (_) {
+            // Try next HTTPS server source
+          }
+        }
+        throw new Error("Server time unavailable");
+      }
+
+      function getJakartaCalendarDate(utcMs) {
+        try {
+          const formatter = new Intl.DateTimeFormat("en-CA", {
+            timeZone: "Asia/Jakarta",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit"
+          });
+          const parts = formatter.formatToParts(new Date(utcMs));
+          let year = 0;
+          let month = 0;
+          let day = 0;
+          for (let i = 0; i < parts.length; i++) {
+            if (parts[i].type === "year") year = parseInt(parts[i].value, 10);
+            if (parts[i].type === "month") month = parseInt(parts[i].value, 10);
+            if (parts[i].type === "day") day = parseInt(parts[i].value, 10);
+          }
+          if (year >= 2000 && month >= 1 && month <= 12 && day >= 1 && day <= 31) {
+            return { year: year, month: month, day: day };
+          }
+        } catch (_) {
+          // Fallback to fixed UTC+7 offset for Asia/Jakarta
+        }
+        const jakartaShifted = new Date(utcMs + 7 * 3600 * 1000);
+        return {
+          year: jakartaShifted.getUTCFullYear(),
+          month: jakartaShifted.getUTCMonth() + 1,
+          day: jakartaShifted.getUTCDate()
+        };
+      }
+
+      function computeExpectedAccessCode(utcMs) {
+        const cal = getJakartaCalendarDate(utcMs);
+        const dt = new Date(Date.UTC(cal.year, cal.month - 1, cal.day));
+        dt.setUTCDate(dt.getUTCDate() + 21);
+        const y = String(dt.getUTCFullYear()).padStart(4, "0");
+        const m = String(dt.getUTCMonth() + 1).padStart(2, "0");
+        const d = String(dt.getUTCDate()).padStart(2, "0");
+        return y + m + d;
+      }
+
+      function constantTimeStringEqual(a, b) {
+        if (typeof a !== "string" || typeof b !== "string") return false;
+        const maxLen = Math.max(a.length, b.length);
+        let diff = a.length ^ b.length;
+        for (let i = 0; i < maxLen; i++) {
+          const ca = i < a.length ? a.charCodeAt(i) : 0;
+          const cb = i < b.length ? b.charCodeAt(i) : 0;
+          diff |= ca ^ cb;
+        }
+        return diff === 0;
+      }
+
+      function setServerStatus(state, message) {
+        serverDot.className = "status-dot " + state;
+        serverStatusText.textContent = message;
+        if (state === "error") {
+          retryTimeBtn.classList.remove("hidden");
+        } else {
+          retryTimeBtn.classList.add("hidden");
+        }
+      }
+
+      function showGateAlert(message) {
+        gateAlert.textContent = message;
+        gateAlert.classList.remove("hidden");
+      }
+
+      function hideGateAlert() {
+        gateAlert.textContent = "";
+        gateAlert.classList.add("hidden");
+      }
+
+      async function checkServerTimeAvailability() {
+        setServerStatus("checking", "Verifying server time...");
+        try {
+          await fetchServerUtcMillis();
+          setServerStatus("ready", "Server time verified");
+        } catch (_) {
+          setServerStatus("error", "Server time unavailable");
+        }
+      }
+
+      retryTimeBtn.addEventListener("click", function () {
+        hideGateAlert();
+        checkServerTimeAvailability();
+      });
+
+      togglePasscodeBtn.addEventListener("click", function () {
+        const isHidden = passcodeInput.type === "password";
+        passcodeInput.type = isHidden ? "text" : "password";
+        togglePasscodeBtn.textContent = isHidden ? "Hide" : "Show";
+      });
+
+      gateForm.addEventListener("submit", async function (e) {
+        e.preventDefault();
+        hideGateAlert();
+
+        const entered = passcodeInput.value.trim();
+        if (!entered) {
+          showGateAlert("Passcode is required.");
+          return;
+        }
+
+        unlockBtn.disabled = true;
+        unlockBtn.textContent = "VERIFYING...";
+        setServerStatus("checking", "Verifying server time...");
+
+        try {
+          const serverUtcMs = await fetchServerUtcMillis();
+          setServerStatus("ready", "Server time verified");
+
+          const expected = computeExpectedAccessCode(serverUtcMs);
+          if (!constantTimeStringEqual(entered, expected)) {
+            showGateAlert("Access denied. Invalid passcode.");
+            return;
+          }
+
+          // Unlock succeeded: clear gate field and switch to workspace
+          passcodeInput.value = "";
+          passcodeInput.type = "password";
+          togglePasscodeBtn.textContent = "Show";
+          hideGateAlert();
+
+          gateView.classList.add("hidden");
+          appView.classList.remove("hidden");
+          textInput.focus();
+        } catch (_) {
+          setServerStatus("error", "Server time unavailable");
+          showGateAlert("Unable to verify access. Check your connection and try again.");
+        } finally {
+          unlockBtn.disabled = false;
+          unlockBtn.textContent = "UNLOCK";
+        }
+      });
+
+      /* =====================================================================
+       * BASE64 & BYTE UTILITIES (STRICT RFC 4648 STANDARD BASE64)
+       * ===================================================================== */
+      function bytesToBase64(bytes) {
+        const chunkSize = 8192;
+        let binary = "";
+        for (let i = 0; i < bytes.length; i += chunkSize) {
+          const slice = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+          binary += String.fromCharCode.apply(null, slice);
+        }
+        return btoa(binary);
+      }
+
+      function base64ToBytes(str) {
+        const trimmed = str.trim();
+        if (trimmed.length === 0) {
+          throw new Error("EMPTY_INPUT");
+        }
+        // Strict standard Base64 check: no prefixes, no URL-safe chars, proper length
+        if (trimmed.length % 4 !== 0 || !/^[A-Za-z0-9+/]+={0,2}$/.test(trimmed)) {
+          throw new Error("INVALID_FORMAT");
+        }
+        try {
+          const binary = atob(trimmed);
+          const bytes = new Uint8Array(binary.length);
+          for (let i = 0; i < binary.length; i++) {
+            bytes[i] = binary.charCodeAt(i);
+          }
+          return bytes;
+        } catch (_) {
+          throw new Error("INVALID_FORMAT");
+        }
+      }
+
+      function concatBytes(arrays) {
+        let total = 0;
+        for (let i = 0; i < arrays.length; i++) {
+          total += arrays[i].length;
+        }
+        const out = new Uint8Array(total);
+        let offset = 0;
+        for (let i = 0; i < arrays.length; i++) {
+          out.set(arrays[i], offset);
+          offset += arrays[i].length;
+        }
+        return out;
+      }
+
+      function constantTimeBytesEqual(a, b) {
+        if (a.length !== b.length) return false;
+        let diff = 0;
+        for (let i = 0; i < a.length; i++) {
+          diff |= a[i] ^ b[i];
+        }
+        return diff === 0;
+      }
+
+      /* =====================================================================
+       * KEY DERIVATION (PBKDF2-HMAC-SHA256, 600,000 ITERATIONS)
+       * ===================================================================== */
+      async function deriveBitsPBKDF2(passphrase, saltBytes, outputBytes) {
+        const passBytes = textEncoder.encode(passphrase);
+        const keyMaterial = await crypto.subtle.importKey(
+          "raw",
+          passBytes,
+          { name: "PBKDF2" },
+          false,
+          ["deriveBits"]
+        );
+        const bits = await crypto.subtle.deriveBits(
+          {
+            name: "PBKDF2",
+            salt: saltBytes,
+            iterations: PBKDF2_ITERATIONS,
+            hash: "SHA-256"
+          },
+          keyMaterial,
+          outputBytes * 8
+        );
+        return new Uint8Array(bits);
+      }
+
+      /* =====================================================================
+       * PTE1: AES-256-GCM (RANDOMIZED AEAD)
+       * Payload: salt (16B) || nonce (12B) || ciphertext || tag (16B)
+       * ===================================================================== */
+      async function encryptPTE1(plaintext, passphrase) {
+        const salt = crypto.getRandomValues(new Uint8Array(PTE1_SALT_BYTES));
+        const nonce = crypto.getRandomValues(new Uint8Array(PTE1_NONCE_BYTES));
+        const dk = await deriveBitsPBKDF2(passphrase, salt, 32);
+
+        const aesKey = await crypto.subtle.importKey(
+          "raw",
+          dk,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["encrypt"]
+        );
+
+        const ptBytes = textEncoder.encode(plaintext);
+        const ctWithTagBuffer = await crypto.subtle.encrypt(
+          {
+            name: "AES-GCM",
+            iv: nonce,
+            tagLength: PTE1_TAG_BITS
+          },
+          aesKey,
+          ptBytes
+        );
+
+        const payload = concatBytes([salt, nonce, new Uint8Array(ctWithTagBuffer)]);
+        return bytesToBase64(payload);
+      }
+
+      async function decryptPTE1(base64Ciphertext, passphrase) {
+        const payload = base64ToBytes(base64Ciphertext);
+        if (payload.length < PTE1_MIN_PAYLOAD) {
+          throw new Error("INVALID_FORMAT");
+        }
+
+        const salt = payload.slice(0, PTE1_SALT_BYTES);
+        const nonce = payload.slice(PTE1_SALT_BYTES, PTE1_SALT_BYTES + PTE1_NONCE_BYTES);
+        const ctWithTag = payload.slice(PTE1_SALT_BYTES + PTE1_NONCE_BYTES);
+
+        const dk = await deriveBitsPBKDF2(passphrase, salt, 32);
+        const aesKey = await crypto.subtle.importKey(
+          "raw",
+          dk,
+          { name: "AES-GCM", length: 256 },
+          false,
+          ["decrypt"]
+        );
+
+        let ptBuffer;
+        try {
+          ptBuffer = await crypto.subtle.decrypt(
+            {
+              name: "AES-GCM",
+              iv: nonce,
+              tagLength: PTE1_TAG_BITS
+            },
+            aesKey,
+            ctWithTag
+          );
+        } catch (_) {
+          throw new Error("AUTH_FAILED");
+        }
+
+        try {
+          return textDecoderFatal.decode(new Uint8Array(ptBuffer));
+        } catch (_) {
+          throw new Error("AUTH_FAILED");
+        }
+      }
+
+      /* =====================================================================
+       * PTE2: DETERMINISTIC AES-256-SIV (RFC 5297 & RFC 4493 AES-CMAC)
+       * Payload: SIV (16B) || ciphertext
+       * Fixed Salt: "PTE2-FIXED-SALT-AES256SIV-V1" (28 bytes)
+       * ===================================================================== */
+      function dbl128(block) {
+        const out = new Uint8Array(16);
+        let carry = 0;
+        for (let i = 15; i >= 0; i--) {
+          const val = ((block[i] << 1) & 0xff) | carry;
+          carry = (block[i] >>> 7) & 1;
+          out[i] = val;
+        }
+        if ((block[0] & 0x80) !== 0) {
+          out[15] ^= 0x87;
+        }
+        return out;
+      }
+
+      async function aesEcbSingleBlock(cbcKey, block16) {
+        const zeroIv = new Uint8Array(16);
+        const enc = await crypto.subtle.encrypt(
+          { name: "AES-CBC", iv: zeroIv },
+          cbcKey,
+          block16
+        );
+        return new Uint8Array(enc, 0, 16);
+      }
+
+      async function aesCmac256(cbcKey, message) {
+        const zeroBlock = new Uint8Array(16);
+        const L = await aesEcbSingleBlock(cbcKey, zeroBlock);
+        const subkey1 = dbl128(L);
+        const subkey2 = dbl128(subkey1);
+
+        const len = message.length;
+        const n = len === 0 ? 1 : Math.ceil(len / 16);
+        const isComplete = len > 0 && (len % 16 === 0);
+
+        const lastBlock = new Uint8Array(16);
+        if (isComplete) {
+          const offset = (n - 1) * 16;
+          for (let i = 0; i < 16; i++) {
+            lastBlock[i] = message[offset + i] ^ subkey1[i];
+          }
+        } else {
+          const offset = (n - 1) * 16;
+          const rem = len - offset;
+          const padded = new Uint8Array(16);
+          if (rem > 0) {
+            padded.set(message.subarray(offset, len), 0);
+          }
+          padded[rem] = 0x80;
+          for (let i = 0; i < 16; i++) {
+            lastBlock[i] = padded[i] ^ subkey2[i];
+          }
+        }
+
+        const cbcInput = new Uint8Array(n * 16);
+        if (n > 1) {
+          cbcInput.set(message.subarray(0, (n - 1) * 16), 0);
+        }
+        cbcInput.set(lastBlock, (n - 1) * 16);
+
+        const zeroIv = new Uint8Array(16);
+        const cbcOut = await crypto.subtle.encrypt(
+          { name: "AES-CBC", iv: zeroIv },
+          cbcKey,
+          cbcInput
+        );
+        return new Uint8Array(cbcOut, (n - 1) * 16, 16);
+      }
+
+      // RFC 5297 Section 2.4 S2V with empty AD list (AD = [])
+      async function s2vEmptyAD(k1CbcKey, plaintextBytes) {
+        const d = await aesCmac256(k1CbcKey, new Uint8Array(16));
+        if (plaintextBytes.length >= 16) {
+          const t = new Uint8Array(plaintextBytes);
+          const start = t.length - 16;
+          for (let i = 0; i < 16; i++) {
+            t[start + i] ^= d[i];
+          }
+          return aesCmac256(k1CbcKey, t);
+        } else {
+          const dDoubled = dbl128(d);
+          const padded = new Uint8Array(16);
+          padded.set(plaintextBytes, 0);
+          padded[plaintextBytes.length] = 0x80;
+          const t = new Uint8Array(16);
+          for (let i = 0; i < 16; i++) {
+            t[i] = dDoubled[i] ^ padded[i];
+          }
+          return aesCmac256(k1CbcKey, t);
+        }
+      }
+
+      function maskSivCounter(siv16) {
+        const q = new Uint8Array(siv16);
+        // RFC 5297 Section 2.5: Q = V bitand 0xffffffffffffffff7fffffff7fffffff
+        q[8] &= 0x7f;
+        q[12] &= 0x7f;
+        return q;
+      }
+
+      async function encryptPTE2(plaintext, passphrase) {
+        const fixedSaltBytes = textEncoder.encode(PTE2_FIXED_SALT_STR);
+        const dk64 = await deriveBitsPBKDF2(passphrase, fixedSaltBytes, PTE2_DK_BYTES);
+
+        const k1Bytes = dk64.slice(0, 32);
+        const k2Bytes = dk64.slice(32, 64);
+
+        const k1CbcKey = await crypto.subtle.importKey(
+          "raw",
+          k1Bytes,
+          { name: "AES-CBC", length: 256 },
+          false,
+          ["encrypt"]
+        );
+        const k2CtrKey = await crypto.subtle.importKey(
+          "raw",
+          k2Bytes,
+          { name: "AES-CTR", length: 256 },
+          false,
+          ["encrypt"]
+        );
+
+        const ptBytes = textEncoder.encode(plaintext);
+        const siv = await s2vEmptyAD(k1CbcKey, ptBytes);
+        const counterQ = maskSivCounter(siv);
+
+        const ctBuffer = await crypto.subtle.encrypt(
+          {
+            name: "AES-CTR",
+            counter: counterQ,
+            length: 128
+          },
+          k2CtrKey,
+          ptBytes
+        );
+
+        const payload = concatBytes([siv, new Uint8Array(ctBuffer)]);
+        return bytesToBase64(payload);
+      }
+
+      async function decryptPTE2(base64Ciphertext, passphrase) {
+        const payload = base64ToBytes(base64Ciphertext);
+        if (payload.length < PTE2_MIN_PAYLOAD) {
+          throw new Error("INVALID_FORMAT");
+        }
+
+        const siv = payload.slice(0, 16);
+        const ciphertext = payload.slice(16);
+
+        const fixedSaltBytes = textEncoder.encode(PTE2_FIXED_SALT_STR);
+        const dk64 = await deriveBitsPBKDF2(passphrase, fixedSaltBytes, PTE2_DK_BYTES);
+
+        const k1Bytes = dk64.slice(0, 32);
+        const k2Bytes = dk64.slice(32, 64);
+
+        const k1CbcKey = await crypto.subtle.importKey(
+          "raw",
+          k1Bytes,
+          { name: "AES-CBC", length: 256 },
+          false,
+          ["encrypt"]
+        );
+        const k2CtrKey = await crypto.subtle.importKey(
+          "raw",
+          k2Bytes,
+          { name: "AES-CTR", length: 256 },
+          false,
+          ["decrypt"]
+        );
+
+        const counterQ = maskSivCounter(siv);
+        const ptBuffer = await crypto.subtle.decrypt(
+          {
+            name: "AES-CTR",
+            counter: counterQ,
+            length: 128
+          },
+          k2CtrKey,
+          ciphertext
+        );
+
+        const ptBytes = new Uint8Array(ptBuffer);
+        const expectedSiv = await s2vEmptyAD(k1CbcKey, ptBytes);
+
+        if (!constantTimeBytesEqual(siv, expectedSiv)) {
+          throw new Error("AUTH_FAILED");
+        }
+
+        try {
+          return textDecoderFatal.decode(ptBytes);
+        } catch (_) {
+          throw new Error("AUTH_FAILED");
+        }
+      }
+
+      /* =====================================================================
+       * WORKSPACE UI & INTERACTION HANDLERS
+       * ===================================================================== */
+      function setWorkspaceStatus(type, message) {
+        if (!message) {
+          workspaceStatus.textContent = "";
+          workspaceStatus.className = "alert-box hidden";
+          return;
+        }
+        workspaceStatus.textContent = message;
+        workspaceStatus.className = "alert-box " + type;
+      }
+
+      function setBusyState(busy, statusText) {
+        isBusy = busy;
+        encryptBtn.disabled = busy;
+        decryptBtn.disabled = busy;
+        clearBtn.disabled = busy;
+        tabPte1.disabled = busy;
+        tabPte2.disabled = busy;
+        if (busy && statusText) {
+          setWorkspaceStatus("info", statusText);
+        }
+      }
+
+      function switchMode(mode) {
+        if (isBusy) return;
+        activeMode = mode;
+        setWorkspaceStatus("", "");
+
+        if (mode === "PTE1") {
+          tabPte1.classList.add("active");
+          tabPte1.setAttribute("aria-pressed", "true");
+          tabPte2.classList.remove("active");
+          tabPte2.setAttribute("aria-pressed", "false");
+
+          activeModeIndicator.textContent = "MODE AKTIF: PTE1";
+          activeAlgoName.textContent = "AES-256-GCM (PBKDF2-HMAC-SHA256, 600.000 iterasi)";
+          pte2Warning.classList.add("hidden");
+          payloadFormatInfo.textContent =
+            "Format Payload PTE1: Base64( salt [16 byte] || nonce [12 byte] || ciphertext || authentication tag [16 byte] ) — AAD kosong, tanpa prefix.";
+        } else {
+          tabPte2.classList.add("active");
+          tabPte2.setAttribute("aria-pressed", "true");
+          tabPte1.classList.remove("active");
+          tabPte1.setAttribute("aria-pressed", "false");
+
+          activeModeIndicator.textContent = "MODE AKTIF: PTE2";
+          activeAlgoName.textContent = "AES-256-SIV RFC 5297 (PBKDF2-HMAC-SHA256, 600.000 iterasi)";
+          pte2Warning.classList.remove("hidden");
+          payloadFormatInfo.textContent =
+            "Format Payload PTE2: Base64( SIV [16 byte] || ciphertext ) — AAD kosong, tanpa nonce, tanpa prefix.";
+        }
+      }
+
+      function checkCryptoSupport() {
+        return Boolean(
+          window.crypto &&
+          window.crypto.subtle &&
+          typeof window.crypto.getRandomValues === "function"
+        );
+      }
+
+      function clearSensitiveWorkspace() {
+        textInput.value = "";
+        passphraseInput.value = "";
+        passphraseInput.type = "password";
+        togglePassphraseBtn.textContent = "Tampilkan";
+        resultOutput.value = "";
+        setWorkspaceStatus("", "");
+      }
+
+      tabPte1.addEventListener("click", function () {
+        switchMode("PTE1");
+      });
+
+      tabPte2.addEventListener("click", function () {
+        switchMode("PTE2");
+      });
+
+      togglePassphraseBtn.addEventListener("click", function () {
+        const isHidden = passphraseInput.type === "password";
+        passphraseInput.type = isHidden ? "text" : "password";
+        togglePassphraseBtn.textContent = isHidden ? "Sembunyikan" : "Tampilkan";
+      });
+
+      aboutToggleBtn.addEventListener("click", function () {
+        aboutPanel.classList.toggle("hidden");
+      });
+
+      closeAboutBtn.addEventListener("click", function () {
+        aboutPanel.classList.add("hidden");
+      });
+
+      clearBtn.addEventListener("click", function () {
+        if (isBusy) return;
+        clearSensitiveWorkspace();
+      });
+
+      lockBtn.addEventListener("click", function () {
+        if (isBusy) return;
+        clearSensitiveWorkspace();
+        aboutPanel.classList.add("hidden");
+        passcodeInput.value = "";
+        passcodeInput.type = "password";
+        togglePasscodeBtn.textContent = "Show";
+        hideGateAlert();
+
+        appView.classList.add("hidden");
+        gateView.classList.remove("hidden");
+        checkServerTimeAvailability();
+        passcodeInput.focus();
+      });
+
+      copyBtn.addEventListener("click", async function () {
+        const value = resultOutput.value;
+        if (!value) {
+          setWorkspaceStatus("error", "Belum ada hasil untuk disalin.");
+          return;
+        }
+        try {
+          if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+            await navigator.clipboard.writeText(value);
+            setWorkspaceStatus("success", "Hasil berhasil disalin ke clipboard.");
+            return;
+          }
+          throw new Error("Clipboard API unavailable");
+        } catch (_) {
+          try {
+            resultOutput.focus();
+            resultOutput.select();
+            const ok = document.execCommand("copy");
+            if (ok) {
+              setWorkspaceStatus("success", "Hasil berhasil disalin ke clipboard.");
+              return;
+            }
+          } catch (__) {
+            // Fall through to error message
+          }
+          setWorkspaceStatus("error", "Clipboard tidak tersedia. Salin hasil secara manual.");
+        }
+      });
+
+      encryptBtn.addEventListener("click", async function () {
+        if (isBusy) return;
+
+        if (!checkCryptoSupport()) {
+          setWorkspaceStatus("error", "Browser tidak mendukung fitur kriptografi yang diperlukan.");
+          return;
+        }
+
+        const plaintext = textInput.value;
+        const passphrase = passphraseInput.value;
+
+        if (plaintext.length === 0) {
+          setWorkspaceStatus("error", "Input masih kosong.");
+          return;
+        }
+        if (passphrase.length === 0) {
+          setWorkspaceStatus("error", "Master passphrase wajib diisi.");
+          return;
+        }
+
+        resultOutput.value = "";
+        setBusyState(true, "Memproses enkripsi " + activeMode + "...");
+
+        // Yield one frame so browser renders the loading indicator before PBKDF2 runs
+        await new Promise(function (resolve) {
+          requestAnimationFrame(function () {
+            setTimeout(resolve, 16);
+          });
+        });
+
+        try {
+          let encoded;
+          if (activeMode === "PTE1") {
+            encoded = await encryptPTE1(plaintext, passphrase);
+          } else {
+            encoded = await encryptPTE2(plaintext, passphrase);
+          }
+          resultOutput.value = encoded;
+          setWorkspaceStatus("success", "Enkripsi " + activeMode + " berhasil.");
+        } catch (_) {
+          resultOutput.value = "";
+          setWorkspaceStatus("error", "Enkripsi gagal dijalankan.");
+        } finally {
+          setBusyState(false);
+        }
+      });
+
+      decryptBtn.addEventListener("click", async function () {
+        if (isBusy) return;
+
+        if (!checkCryptoSupport()) {
+          setWorkspaceStatus("error", "Browser tidak mendukung fitur kriptografi yang diperlukan.");
+          return;
+        }
+
+        const cipherInput = textInput.value;
+        const passphrase = passphraseInput.value;
+
+        if (cipherInput.trim().length === 0) {
+          setWorkspaceStatus("error", "Input masih kosong.");
+          return;
+        }
+        if (passphrase.length === 0) {
+          setWorkspaceStatus("error", "Master passphrase wajib diisi.");
+          return;
+        }
+
+        resultOutput.value = "";
+        setBusyState(true, "Memproses dekripsi " + activeMode + "...");
+
+        await new Promise(function (resolve) {
+          requestAnimationFrame(function () {
+            setTimeout(resolve, 16);
+          });
+        });
+
+        try {
+          let plaintext;
+          if (activeMode === "PTE1") {
+            plaintext = await decryptPTE1(cipherInput, passphrase);
+          } else {
+            plaintext = await decryptPTE2(cipherInput, passphrase);
+          }
+          resultOutput.value = plaintext;
+          setWorkspaceStatus("success", "Dekripsi " + activeMode + " berhasil.");
+        } catch (err) {
+          resultOutput.value = "";
+          if (err && err.message === "INVALID_FORMAT") {
+            setWorkspaceStatus("error", "Format ciphertext tidak sesuai dengan mode yang dipilih.");
+          } else {
+            setWorkspaceStatus("error", "Dekripsi gagal. Passphrase salah atau ciphertext telah dimodifikasi.");
+          }
+        } finally {
+          setBusyState(false);
+        }
+      });
+
+      // Initial server time availability check on load
+      checkServerTimeAvailability();
+    })();
+  </script>
+</body>
+</html>
+
